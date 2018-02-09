@@ -7,13 +7,13 @@ const http = require('http'),
 			iconv = require('iconv-lite'),
 			ctype = require('./lib/content-type'),
 			catalog = require('./lib/catalog'),
-			confproxy = require('./lib/get-proxy-config'),
 			query = require('querystring'),  // 解析POST请求,
-			__port = 1994,
-			cors = false;
+			__port = 1994;
 			require('colors-cli/toxic');
 
-let server
+let server,
+		cors = false,
+		confproxy = require('./lib/get-proxy-config'),
 
 connListener = (req,res) => {
 	let uri = url.parse(req.url).pathname,
@@ -27,7 +27,7 @@ connListener = (req,res) => {
 				};
 	
 			const ext = path.parse(req.url.replace(/\?.*$/g,"")).ext.replace('.',''); //获取扩展名
-			const pxval = confproxy[req.method + '' + uri];
+			const pxval = confproxy[req.method + ' ' + uri];
 			if(pxval){
 				let postData = null,arr = [];
 				req.addListener("data",(postchunk)=>{
@@ -165,11 +165,13 @@ const serverS = (argv) => {
 
 	(argv && argv.cors) ? cors = true : cors = false
 
-	if(argv && argv.proxy){
-		confproxy = confproxy(argv.proxy)
-	}
+	// if(argv && argv.proxy){
+	// 	confproxy = confproxy(argv.proxy)
+	// }
+
+	confproxy = confproxy('mock/proxy.config.js')
 
 	serverStart(pt)
 }
 
-module.exports = serverS;
+serverS()
