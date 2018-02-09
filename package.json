@@ -15,6 +15,9 @@
     "gssr",
     "geekjc"
   ],
+  "bin": {
+    "gssr": "bin/gssr.js"
+  },
   "author": "ll",
   "license": "MIT",
   "bugs": {
@@ -23,6 +26,7 @@
   "homepage": "https://github.com/cllgeek/gssr#readme",
   "dependencies": {
     "colors-cli": "^1.0.13",
-    "iconv-lite": "^0.4.19"
+    "iconv-lite": "^0.4.19",
+    "yargs": "^11.0.0"
   }
 }

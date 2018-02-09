@@ -172,4 +172,4 @@ const serverS = (argv) => {
 	serverStart(pt)
 }
 
-serverS()
+module.exports = serverS;
