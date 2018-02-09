@@ -148,6 +148,25 @@ const serverStart = (_port) =>{
 			server = http.createServer(connListener)
 			server = server.listen(parseInt(_pt,10))
 			console.log("\n  Static file server running at" + color.green("\n\n=> http://localhost:" + _pt ) + '\n')
+		}else{
+			serverStart(_pt+1)
 		}
 	})
+}
+
+const server = (argv) => {
+	let pt = ''
+
+	if(argv && argv.port) pt = argv.port
+	else pt = __port
+	
+	if(argv && argv.port === true) pt = __port
+
+	(argv && argv.cors) ? cors = true : cors = false
+
+	if(argv && argv.proxy){
+		confproxy = confproxy(argv.proxy)
+	}
+
+	serverStart(pt)
 }
