@@ -16,7 +16,7 @@ const http = require('http'),
 
 connListener = (req,res) => {
 	const uri = url.parse(req.url).pathname,
-				fileName = path.join(process.cwd(), uri),
+				filename = path.join(process.cwd(), uri),
 				_header =  !cors ? {
 
 				} : {
@@ -28,7 +28,7 @@ connListener = (req,res) => {
 			const ext = path.parse(req.url.replace(/\?.*$/g,"")).ext.replace('.',''); //获取扩展名
 			const pxval = confproxy[req.method + '' + uri];
 			if(pxval){
-				const postData = null,arr = [];
+				let postData = null,arr = [];
 				req.addListener("data",(postchunk)=>{
 					arr.push(postchunk)
 				})
@@ -69,4 +69,85 @@ connListener = (req,res) => {
 			filename = decodeURIComponent(filename)
 
 			const html = catalog(process.cwd()+req.url)
+
+			if( fs.existsSync(filename) && fs.statSync(filename).isDirectory() && fs.existsSync(filename + '/index.html')) filename += 'index.html'
+			if( fs.existsSync(filename) && fs.statSync(filename).isFile()){
+				fs.readFile(filename,"binary",(err,file)=>{
+					res.writeHead(200,_header)
+					res.write(file,"binary")
+					res.end()
+					commandLog(200,req,res)
+					return
+				})
+			}else{
+				res.writeHead(404,{})
+				res.write(html)
+				res.end()
+				commandLog(404,req,res)
+				return
+			}
+}
+
+const isJson = (obj) => {
+	return typeof(obj) === "object" && Object.prototype.toString.call(obj).toLowerCase() === "[object object]" && !obj.length
+}
+
+// 命令行颜色显示
+const commandLog = (status,req,res) => {
+	const code = res.statusCode
+	if(code === 200){
+		console.log(('INFO ' + req.method + ' ' + code.toString() ).green_bt + ' ' + req.url)
+	}else{
+		console.log(('INFO ' + req.method + ' ' + code.toString()).red_bt + '' + req.url)
+	}
+}
+
+// 检测port是否存在
+const probe = (port, callback) => {
+	const server = net.createServer().listen(port)
+	
+	let calledOnce = false
+
+	const timeoutRef = setTimeout(()=>{
+		calledOnce = true
+		callback(false,port)
+	},2000)
+
+	timeoutRef.unref()
+
+	let connected = false
+
+	server.on('listening',()=>{
+		clearTimeout(timeoutRef)
+
+		if(server) server.close()
+
+		if(!calledOnce){
+			calledOnce = true
+			callback(true,port)
+		}
+	})
+
+	server.on('error',(err)=>{
+		clearTimeout(timeoutRef)
+
+		let result = true
+		if(err.code === 'EADDRINUSE') result = false
+
+		if(!calledOnce){
+			calledOnce = true
+			callback(result,port)
+		}
+	})
+}
+
+// 启动服务
+const serverStart = (_port) =>{
+	probe(_port,(bl,_pt)=>{
+		if(bl === true){
+			server = http.createServer(connListener)
+			server = server.listen(parseInt(_pt,10))
+			console.log("\n  Static file server running at" + color.green("\n\n=> http://localhost:" + _pt ) + '\n')
+		}
+	})
 }
