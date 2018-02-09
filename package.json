@@ -20,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/cllgeek/gssr/issues"
   },
-  "homepage": "https://github.com/cllgeek/gssr#readme"
+  "homepage": "https://github.com/cllgeek/gssr#readme",
+  "dependencies": {
+    "colors-cli": "^1.0.13",
+    "iconv-lite": "^0.4.19"
+  }
 }

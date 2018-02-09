@@ -10,12 +10,13 @@ const http = require('http'),
 			confproxy = require('./lib/get-proxy-config'),
 			query = require('querystring'),  // 解析POST请求,
 			__port = 1994,
-			cors = false,
-			server;
+			cors = false;
 			require('colors-cli/toxic');
 
+let server
+
 connListener = (req,res) => {
-	const uri = url.parse(req.url).pathname,
+	let uri = url.parse(req.url).pathname,
 				filename = path.join(process.cwd(), uri),
 				_header =  !cors ? {
 
@@ -35,7 +36,7 @@ connListener = (req,res) => {
 
 				//POST结束输出结果
 				req.addListener("end",()=>{
-					const data = Buffer.concat(arr).toString(),ret;
+					let data = Buffer.concat(arr).toString(),ret;
 					try{
 						ret = JSON.parse(data);
 					}catch(err){}
@@ -48,9 +49,9 @@ connListener = (req,res) => {
 					res.writeHead(200, {
 						"Content-Type": (()=>{
 							if(isJson(pxval) || Object.prototype.toString.call(pxval)){
-								return ctype.getContentType('json') + ';charset=utf-8';
+								return ctype().getContentType('json') + ';charset=utf-8';
 							}else if(typeof pxval === 'string'){
-								return ctype.getContentType('html')
+								return ctype().getContentType('html')
 							}
 							return '';
 						})()
@@ -63,7 +64,7 @@ connListener = (req,res) => {
 				return
 			}
 
-			if(ext) _header['Content-Type'] = ctype.getContentType(ext)
+			if(ext) _header['Content-Type'] = ctype().getContentType(ext)
 
 			// url 解码
 			filename = decodeURIComponent(filename)
@@ -154,7 +155,7 @@ const serverStart = (_port) =>{
 	})
 }
 
-const server = (argv) => {
+const serverS = (argv) => {
 	let pt = ''
 
 	if(argv && argv.port) pt = argv.port
@@ -170,3 +171,5 @@ const server = (argv) => {
 
 	serverStart(pt)
 }
+
+serverS()
