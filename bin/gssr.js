@@ -2,7 +2,7 @@
 
 const server = require('../index')
 const pkg = require('../package.json')
-const color = require('colors-cli')
+const chalk = require('chalk')
 const yargs = require('yargs')
 
 let argv = yargs
@@ -35,8 +35,8 @@ let argv = yargs
 	.argv;
 
 if(argv.cors || argv.port){
-	if(argv.port&&isNaN(argv.port) || argv.port === true) return console.log(color.red('\n "Port parameter is not of type number.\n"'))
-	if(argv.port < 1029) return console.log(color.red('\n "port" number must be greater than the 1299.\n'))
+	if(argv.port&&isNaN(argv.port) || argv.port === true) return console.log(chalk.red('\n "Port parameter is not of type number.\n"'))
+	if(argv.port < 1029) return console.log(chalk.red('\n "port" number must be greater than the 1299.\n'))
 
 	server(argv)
 }else{
